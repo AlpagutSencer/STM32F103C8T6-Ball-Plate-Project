@@ -1,0 +1,3 @@
+embedded:startup.tcl:60: Error: Can't find openocd.cfg
+in procedure 'script' 
+at file "embedded:startup.tcl", line 60
