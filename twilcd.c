@@ -19,6 +19,7 @@
 #include "string.h"
 #include "delay.h"
 #include "twilcd.h"
+
 #define SLAVE_ADDRESS_LCD 0x4E // change this according to ur setup
 
 

@@ -16,6 +16,7 @@
 #include "string.h"
 #include "delay.h"
 #include "twilcd.h"
+
 void createChar(uint8_t location, uint8_t charmap[]);
 void I2C1_init(void);
 void I2C_SendByteByADDR(unsigned char c,unsigned char addr);

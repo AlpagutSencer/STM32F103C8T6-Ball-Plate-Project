@@ -11,7 +11,10 @@
 #include "semphr.h"
 #include "task.h"
 #include "delay.h"
+#include "interface.h"
 #include "twilcd.h"
+#include "stdbool.h"
+#include "usart.h"
 
 #define SYSCLK 72000000
 #define PRESCALER 72
@@ -19,46 +22,16 @@
 TIM_TimeBaseInitTypeDef timer;
 TIM_OCInitTypeDef timerPWM;
 GPIO_InitTypeDef GPIO_InitStructure;
-USART_InitTypeDef USART_InitStructure;
-USART_ClockInitTypeDef USART_ClockInitStructure; 
-NVIC_InitTypeDef NVIC_InitStructure;
+
 
 static xQueueHandle queue_handle = NULL;
-static unsigned int LEDState = 0;
 void servo_init(void);
 int TIM_Pulse;
 char str[20];
-
-
-
-
-void USART3_IRQHandler(void)
-{
-    if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
-    {
-        if((char)USART_ReceiveData(USART3) == '1')
-            LEDState = 2;
- 
-        if((char)USART_ReceiveData(USART3) == '0')
-            LEDState = 1;
-    }
-    USART_ClearITPendingBit(USART3, USART_IT_RXNE);
-}
-
-
-
 static xSemaphoreHandle trg = NULL;
 
 
-static void USART_SendString(USART_TypeDef* USARTx, char* s)
-{
-    while(*s)
-    {
-        while(!USART_GetFlagStatus(USARTx, USART_FLAG_TC));
-        USART_SendData(USARTx, *s);
-        s++;
-    }
-}
+
 
 
 void triggertask(void *pvParameters)
@@ -70,7 +43,7 @@ void triggertask(void *pvParameters)
 				
 		
 		for(int j=0; j<3;j++){
-	vTaskDelay(750/portTICK_RATE_MS);
+	       vTaskDelay(750/portTICK_RATE_MS);
 			xQueueSend(queue_handle,&txBuffer[j],1000);
 		}
 		
@@ -91,21 +64,22 @@ void sendertask(void *pvParameters)
 	char buffer[16];
 	TIM_Pulse = timerPWM.TIM_Pulse;
 	TIM2->CCR4=2000;
+
     while(1) {
 		
-				for(int i=0; i<3;i++){
+		for(int i=0; i<3;i++){
 	       vTaskDelay(750/portTICK_RATE_MS);
 			xQueueReceive(queue_handle,&rxBuffer[i],1000);
-					TIM2->CCR4=rxBuffer[i];
-					clearlcd();
-					sprintf(buffer, "Servo :%d us ", rxBuffer[i]);
+			TIM2->CCR4=rxBuffer[i];
+			clearlcd();
+			sprintf(buffer, "Servo :%d us ", rxBuffer[i]);
 			setpos(0,0);
 			str_lcd(buffer);
 
 			
 		
-    		//USART_SendString(USART3,buffer);
-				}
+    		
+		}
 				
         
  }
@@ -116,55 +90,15 @@ void sendertask(void *pvParameters)
 int main(){
 	
 	
- SystemInit();
+    SystemInit();
+    
+
 	I2C1_init();
 	lcd_init();
 	clearlcd();
- 
-	
-	
-//----------------------------------------------------------------	
-	
-	  RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-	
-
-	  GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AF_PP;
-    GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_10;
-    GPIO_InitStructure.GPIO_Speed   = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
- 
-		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
-		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING; 
-		GPIO_Init(GPIOB, &GPIO_InitStructure);
-   
- 
-    USART_InitStructure.USART_BaudRate = 115200;
-    USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-    USART_InitStructure.USART_Parity                = USART_Parity_No;
-    USART_InitStructure.USART_StopBits              = USART_StopBits_1;
-    USART_InitStructure.USART_HardwareFlowControl   = USART_HardwareFlowControl_None;
-    USART_InitStructure.USART_Mode                  = USART_Mode_Tx | USART_Mode_Rx;
- 
-    USART_Init(USART3, &USART_InitStructure);
-    USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
-    USART_Cmd(USART3, ENABLE);
- 
-    NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
-	  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
-	
-	
-	
-	
-	
-
- 
- servo_init();
- 
- 
+    servo_init();
+ 	USART_init();
+    USART_SendString(USART1,"hh");
  
  queue_handle = xQueueCreate(3,sizeof(int));
 
