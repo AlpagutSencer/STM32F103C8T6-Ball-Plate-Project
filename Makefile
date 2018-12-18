@@ -88,6 +88,9 @@ $(PROJECT).elf: $(SOURCES)
 
 # remove binary files
 clean:
+	@echo "------------------------------------"
+	@echo "Erasing Solutions"
+	@echo "------------------------------------"
 	rm -f *.o *.elf *.hex *.bin
 
 # flash
