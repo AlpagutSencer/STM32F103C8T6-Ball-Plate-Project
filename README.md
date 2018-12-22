@@ -4,7 +4,7 @@ I will be publish this project as my "graduation project" in my university.
 I am learning a lot stuff on the way! Project is not complated yet. Right now i am dealing with some hardware problems and trying to 
 learn FreeRtos for multitasking.
 
-If you interested please come 6 months later. Everything will be finish.
+If you interested please come 6 months later. Everything will be finished.
 
 Uart communication methods was mainly inspired by İhsan Kehribar.
 
