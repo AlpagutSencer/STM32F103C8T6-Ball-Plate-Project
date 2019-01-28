@@ -37,7 +37,7 @@ void I2C1_init(void)
 {
     I2C_InitTypeDef  I2C_InitStructure;
     GPIO_InitTypeDef  GPIO_InitStructure;
-RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 	GPIO_PinRemapConfig(GPIO_Remap_I2C1, ENABLE);
 	
 	

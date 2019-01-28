@@ -29,10 +29,10 @@ void put32b(uint32_t val) // message train to the pc
   tmpBuf[2] = (val & 0x00FF0000) >> 16;
   tmpBuf[3] = (val & 0xFF000000) >> 24;
 
-  /*USART_SendString(tmpBuf[0]);
-  USART_SendString(tmpBuf[1]);
-  USART_SendString(tmpBuf[2]);
-  USART_SendString(tmpBuf[3]);*/
+  USART_SendData(USART1,tmpBuf[0]);
+  USART_SendData(USART1,tmpBuf[1]);
+  USART_SendData(USART1,tmpBuf[2]);
+  USART_SendData(USART1,tmpBuf[3]);
 }
 
 void packetHandler (){ //state machine of the packet handler (Command handler)
@@ -49,7 +49,7 @@ switch(packetbuffer[1]){
 	case 1: //Send values to the host
 	{
 
-		//put32b();
+		//put32b(rxBuffer[i]);
       
 	}break;
 

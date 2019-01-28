@@ -75,16 +75,34 @@ void sendertask(void *pvParameters)
 			sprintf(buffer, "Servo :%d us ", rxBuffer[i]);
 			setpos(0,0);
 			str_lcd(buffer);
-
+			sprintf(buffer, "%d", packetbuffer[i]);
+			USART_SendString(USART1,buffer);
 			
-		
-    		
 		}
 				
         
  }
-//vTaskDelete(NULL);
 }
+
+void GUI (void *pvParameters){
+
+
+	while(1){
+
+          if(newMessageFlag==true){
+          	packetHandler();
+          	newMessageFlag= false ;
+
+
+          }
+
+
+	}
+
+}
+
+
+
 
 //-----------------------------------------
 int main(){
@@ -98,7 +116,7 @@ int main(){
 	clearlcd();
     servo_init();
  	USART_init();
-    USART_SendString(USART1,"hh");
+    
  
  queue_handle = xQueueCreate(3,sizeof(int));
 

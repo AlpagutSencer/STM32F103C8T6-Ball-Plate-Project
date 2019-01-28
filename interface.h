@@ -26,5 +26,6 @@ extern volatile uint8_t timeoutCnt;
 
 
 void put32b(uint32_t val);
+void packetHandler();
 
 #endif 
