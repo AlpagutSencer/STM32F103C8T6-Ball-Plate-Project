@@ -8,15 +8,19 @@
 
 void put32b(uint32_t val) // message train to the pc 
 {
-  uint8_t tmpBuf[4];
+  uint16_t tmpBuf[2];
   tmpBuf[0] = (val & 0x000000FF) >>  0;
   tmpBuf[1] = (val & 0x0000FF00) >>  8;
   tmpBuf[2] = (val & 0x00FF0000) >> 16;
   tmpBuf[3] = (val & 0xFF000000) >> 24;
 
+while(USART_GetFlagStatus(USART1, USART_FLAG_TC)==RESET);
   USART_SendData(USART1,tmpBuf[0]);
+while(USART_GetFlagStatus(USART1, USART_FLAG_TC)==RESET);
   USART_SendData(USART1,tmpBuf[1]);
+while(USART_GetFlagStatus(USART1, USART_FLAG_TC)==RESET);
   USART_SendData(USART1,tmpBuf[2]);
+while(USART_GetFlagStatus(USART1, USART_FLAG_TC)==RESET);
   USART_SendData(USART1,tmpBuf[3]);
 }
 

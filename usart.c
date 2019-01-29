@@ -24,6 +24,9 @@ volatile uint8_t newMessageFlag=false;
 volatile uint8_t packetbuffer[MAX_MSG_LEN];
 volatile uint8_t packetbufferIndex;
 
+ uint32_t deneme = 123456789;
+
+
 void USART_init(void)
 
 {
@@ -116,23 +119,38 @@ void USART_init(void)
 
 void packetHandler (){
 
- USART_SendString(USART1,"Valid");//state machine of the packet handler (Command handler)
+
+//state machine of the packet handler (Command handler)
+
+
+
+        
+
+
 
 switch(packetbuffer[1]){
 
   case 0: // test message 
   {
       
-    USART_SendString(USART1,"Valid");
+    
 
   }break;
 
   case 1: //Send values to the host
   {
     
-    //put32b(rxBuffer[i]);
-      USART_SendString(USART1,"Valid");
 
+    //USART_SendString(USART1,"      ");
+
+    
+  put32b(deneme);
+  put32b(deneme);
+  put32b(deneme);
+
+
+ 
+    
 
   }break;
 
@@ -158,3 +176,18 @@ void USART_SendString(USART_TypeDef* USARTx, char* s)
         s++;
     }
  }
+
+
+/*void USART_SendInt(USART_TypeDef* USARTx, uint8_t *s)
+ {
+    while(*s)
+    {
+        while(USART_GetFlagStatus(USARTx, USART_FLAG_TC)==RESET);
+        USART_SendData(USARTx, s);
+        s++;
+    }
+ }*/
+
+
+
+

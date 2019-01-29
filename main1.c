@@ -86,8 +86,11 @@ void sendertask(void *pvParameters)
 void GUI (void *pvParameters){
 
 
+	portTickType xLastWakeTime;
+	const portTickType xFrequency = 100;
+	xLastWakeTime = xTaskGetTickCount();
 	while(1){
-		   vTaskDelay(0.3/portTICK_RATE_MS);
+		   vTaskDelayUntil(&xLastWakeTime,xFrequency);
           processPacket();
 
 
