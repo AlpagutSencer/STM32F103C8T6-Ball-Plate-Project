@@ -18,8 +18,11 @@
 #include "interface.h"
 #include "stdbool.h"
 #include "usart.h"
-
-
+#define MAX_MSG_LEN 100
+volatile uint8_t timeoutCnt=250;
+volatile uint8_t newMessageFlag=false;
+volatile uint8_t packetbuffer[MAX_MSG_LEN];
+volatile uint8_t packetbufferIndex;
 
 void USART_init(void)
 
@@ -62,22 +65,29 @@ void USART_init(void)
 
  void USART1_IRQHandler(void)
 {
+
+
     if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
     {
-        /*if((char)USART_ReceiveData(USART3) == '1')
-            LEDState = 2;*/
+        /*if((char)USART_ReceiveData(USART1) == '1'){
+            USART_SendString(USART1,"Valid");}*/
  
       
-      volatile uint8_t data = (uint8_t) USART_ReceiveData(USART1);
 
-      if(newMessageFlag == false){
+      volatile uint8_t data = USART_ReceiveData(USART1);
+
+      if(newMessageFlag == true){
+
+      }
+
+      else{
 
       	packetbuffer[packetbufferIndex]=data;
       	packetbufferIndex++;
 
       	 if(packetbufferIndex> MAX_MSG_LEN){ //buffer overflow control
       	 	packetbufferIndex=0;
-      	 	newMessageFlag= true;
+      	 	newMessageFlag= false;
 
       	 }
       	 else if (packetbufferIndex==packetbuffer[0]){ //flag for main method to handle the incoming packet
@@ -93,13 +103,50 @@ void USART_init(void)
 
 
 
-      }
     }
+      USART_ClearITPendingBit(USART1, USART_IT_RXNE);
+  }
 
-    USART_ClearITPendingBit(USART1, USART_IT_RXNE);
 }
 
 
+    
+
+
+
+void packetHandler (){
+
+ USART_SendString(USART1,"Valid");//state machine of the packet handler (Command handler)
+
+switch(packetbuffer[1]){
+
+  case 0: // test message 
+  {
+      
+    USART_SendString(USART1,"Valid");
+
+  }break;
+
+  case 1: //Send values to the host
+  {
+    
+    //put32b(rxBuffer[i]);
+      USART_SendString(USART1,"Valid");
+
+
+  }break;
+
+
+ }
+}
+
+void processPacket(void){
+
+  if(newMessageFlag==true){
+    packetHandler();
+    newMessageFlag= false;
+  }
+}
 
 
 void USART_SendString(USART_TypeDef* USARTx, char* s)

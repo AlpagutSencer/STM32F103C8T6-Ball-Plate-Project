@@ -6,21 +6,6 @@
 #include "usart.h"
 
 
-volatile uint8_t timeoutCnt=250;
-volatile uint8_t newMessageFlag=false;
-volatile uint8_t packetbuffer[MAX_MSG_LEN];
-volatile uint8_t packetbufferIndex;
-
-
-/*
-       oooOOOOOOOOOOO" cu-cu-cu-cu-düüüütt düüüttt BİLETLERRRRRRRRR
-     o   ____          :::::::::::::::::: :::::::::::::::::: __|-----|__
-     Y_,_|[]| --++++++ |[][][][][][][][]| |[][][][][][][][]| |  [] []  |
-    {|_|_|__|;|______|;|________________|;|________________|;|_________|;
-     /oo--OO   oo  oo   oo oo      oo oo   oo oo      oo oo   oo     oo
-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-*/
-
 void put32b(uint32_t val) // message train to the pc 
 {
   uint8_t tmpBuf[4];
@@ -35,24 +20,13 @@ void put32b(uint32_t val) // message train to the pc
   USART_SendData(USART1,tmpBuf[3]);
 }
 
-void packetHandler (){ //state machine of the packet handler (Command handler)
-
-switch(packetbuffer[1]){
-
-	case 0: // test message 
-	{
-      
-		USART_SendString(USART3,"Valid");
-
-	}break;
-
-	case 1: //Send values to the host
-	{
-
-		//put32b(rxBuffer[i]);
-      
-	}break;
-
-
- }
+uint32_t make32b(uint8_t* buff, int32_t offset)
+{
+  uint32_t rv = 0;
+  rv += buff[offset+0] <<  0;
+  rv += buff[offset+1] <<  8;
+  rv += buff[offset+2] << 16;
+  rv += buff[offset+3] << 24;
+  return rv;
 }
+

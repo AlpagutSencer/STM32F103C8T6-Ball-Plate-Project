@@ -75,8 +75,7 @@ void sendertask(void *pvParameters)
 			sprintf(buffer, "Servo :%d us ", rxBuffer[i]);
 			setpos(0,0);
 			str_lcd(buffer);
-			sprintf(buffer, "%d", packetbuffer[i]);
-			USART_SendString(USART1,buffer);
+			
 			
 		}
 				
@@ -88,13 +87,8 @@ void GUI (void *pvParameters){
 
 
 	while(1){
-
-          if(newMessageFlag==true){
-          	packetHandler();
-          	newMessageFlag= false ;
-
-
-          }
+		   vTaskDelay(0.3/portTICK_RATE_MS);
+          processPacket();
 
 
 	}
@@ -125,6 +119,7 @@ int main(){
  //Create task to blink gpio
  xTaskCreate(triggertask, (const char *)"triggertask", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
  xTaskCreate(sendertask, (const char *)"sendertask", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
+ xTaskCreate(GUI, (const char *)"GUI", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
  //Start the scheduler
  vTaskStartScheduler();
  

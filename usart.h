@@ -11,7 +11,8 @@
 #include "interface.h"
 #include "stdbool.h"
 
-
+void packetHandler();
+void processPacket(void);
 void USART_init(void);
 void USART_SendString(USART_TypeDef* USARTx, char* s);
 void USART1_IRQHandler(void);

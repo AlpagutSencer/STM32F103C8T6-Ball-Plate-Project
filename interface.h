@@ -17,15 +17,12 @@
 #include "twilcd.h"
 #include "stdbool.h"
 
-#define MAX_MSG_LEN 100
 
-extern volatile uint8_t packetbuffer[MAX_MSG_LEN];
-extern volatile uint8_t newMessageFlag;
-extern volatile uint8_t packetbufferIndex;
-extern volatile uint8_t timeoutCnt;
 
 
 void put32b(uint32_t val);
-void packetHandler();
+uint32_t make32b(uint8_t* buff, int32_t offset);
+
+
 
 #endif 
