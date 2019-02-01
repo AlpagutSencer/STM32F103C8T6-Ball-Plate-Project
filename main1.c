@@ -87,7 +87,7 @@ void GUI (void *pvParameters){
 
 
 	portTickType xLastWakeTime;
-	const portTickType xFrequency = 100;
+	const portTickType xFrequency = 10;
 	xLastWakeTime = xTaskGetTickCount();
 	while(1){
 		   vTaskDelayUntil(&xLastWakeTime,xFrequency);
