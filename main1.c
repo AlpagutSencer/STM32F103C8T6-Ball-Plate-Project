@@ -37,20 +37,20 @@ static xSemaphoreHandle trg = NULL;
 void triggertask(void *pvParameters)
 {
 	int txBuffer[3]={650,1500,2200};
-	
+
     while(1) {
-			
-				
-		
+
+
+
 		for(int j=0; j<3;j++){
 	       vTaskDelay(750/portTICK_RATE_MS);
 			xQueueSend(queue_handle,&txBuffer[j],1000);
 		}
-		
-		 
+
+
 		//vTaskDelay(1000/portTICK_RATE_MS);
 			}
-		
+
 			//vTaskDelete(NULL);
 		}
 
@@ -58,15 +58,15 @@ void triggertask(void *pvParameters)
 
 void sendertask(void *pvParameters)
 {
-	
-	
+
+
 	int rxBuffer[3];
 	char buffer[16];
 	TIM_Pulse = timerPWM.TIM_Pulse;
 	TIM2->CCR4=2000;
 
     while(1) {
-		
+
 		for(int i=0; i<3;i++){
 	       vTaskDelay(750/portTICK_RATE_MS);
 			xQueueReceive(queue_handle,&rxBuffer[i],1000);
@@ -75,11 +75,15 @@ void sendertask(void *pvParameters)
 			sprintf(buffer, "Servo :%d us ", rxBuffer[i]);
 			setpos(0,0);
 			str_lcd(buffer);
-			
-			
+			setpos(0,1);
+			sprintf(buffer,"f: %lu" ,get_cpuFreq());
+			str_lcd(buffer);
+
+
+
 		}
-				
-        
+
+
  }
 }
 
@@ -103,29 +107,29 @@ void GUI (void *pvParameters){
 
 //-----------------------------------------
 int main(){
-	
-	
+
+
     SystemInit();
-    
+
 
 	I2C1_init();
 	lcd_init();
 	clearlcd();
     servo_init();
  	USART_init();
-    
- 
+
+
  queue_handle = xQueueCreate(3,sizeof(int));
 
 	vSemaphoreCreateBinary(trg);
-	
+
  //Create task to blink gpio
  xTaskCreate(triggertask, (const char *)"triggertask", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
  xTaskCreate(sendertask, (const char *)"sendertask", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
  xTaskCreate(GUI, (const char *)"GUI", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
  //Start the scheduler
  vTaskStartScheduler();
- 
+
  //Should never reach here
  while(10);
 }
@@ -140,8 +144,7 @@ void servo_init(void) {
 	GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AF_PP;
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
 
 	TIM_TimeBaseStructInit(&timer);
 	timer.TIM_Prescaler = PRESCALER;
@@ -159,5 +162,3 @@ void servo_init(void) {
 
     TIM_Cmd(TIM2, ENABLE);
 }
-
-

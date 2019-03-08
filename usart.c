@@ -24,7 +24,7 @@ volatile uint8_t newMessageFlag=false;
 volatile uint8_t packetbuffer[MAX_MSG_LEN];
 volatile uint8_t packetbufferIndex;
 
- uint32_t deneme = 123456789;
+ uint32_t deneme = 123456789; //trying packet
 
 
 void USART_init(void)
@@ -74,8 +74,8 @@ void USART_init(void)
     {
         /*if((char)USART_ReceiveData(USART1) == '1'){
             USART_SendString(USART1,"Valid");}*/
- 
-      
+
+
 
       volatile uint8_t data = USART_ReceiveData(USART1);
 
@@ -99,7 +99,7 @@ void USART_init(void)
       	 	newMessageFlag= true;
 
       	 }
-      	 
+
       	 else{
       	 	timeoutCnt=200;
       	 }
@@ -113,7 +113,7 @@ void USART_init(void)
 }
 
 
-    
+
 
 
 
@@ -124,33 +124,33 @@ void packetHandler (){
 
 
 
-        
+
 
 
 
 switch(packetbuffer[1]){
 
-  case 0: // test message 
+  case 0: // test message
   {
-      
-    
+
+
 
   }break;
 
   case 1: //Send values to the host
   {
-    
+
 
     //USART_SendString(USART1,"      ");
 
-    
+
   put32b(deneme);
   put32b(deneme);
   put32b(deneme);
 
 
- 
-    
+
+
 
   }break;
 
@@ -187,7 +187,3 @@ void USART_SendString(USART_TypeDef* USARTx, char* s)
         s++;
     }
  }*/
-
-
-
-

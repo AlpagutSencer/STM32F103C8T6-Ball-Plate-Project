@@ -1,6 +1,6 @@
 /*
 * ----------------------------------------------------------------------------
-* “BUY ME A BEER LICENSE”:
+* ï¿½BUY ME A BEER LICENSEï¿½:
 * This library is created by Alpagut Sencer KARACA(alpaguty@gmail.com)
 *If you have any question, feel free to post me!
 *As long as you retain my name,you can do whatever you like in this file.
@@ -14,5 +14,4 @@
 
 void _delay_ms(uint32_t ms);
 void _delay_us(uint32_t mc);
-
-
+uint32_t get_cpuFreq (void);
