@@ -22,6 +22,7 @@
 
 void put32b(uint32_t val);
 uint32_t make32b(uint8_t* buff, int32_t offset);
+void buzzerInit (void);
 
 
 

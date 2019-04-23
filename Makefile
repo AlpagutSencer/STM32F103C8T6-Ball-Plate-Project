@@ -32,6 +32,7 @@ SOURCES += twilcd.c
 SOURCES += delay.c
 SOURCES += interface.c
 SOURCES += usart.c
+SOURCES += touch.c
 SOURCES += $(STD_PERIPH_LIBS)/Libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x/startup/TrueSTUDIO/startup_stm32f10x_md.s
 SOURCES += $(RTOS_LIBS)/Source/croutine.c
 SOURCES += $(RTOS_LIBS)/Source/event_groups.c

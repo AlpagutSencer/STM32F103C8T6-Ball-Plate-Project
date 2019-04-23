@@ -36,7 +36,7 @@ static xSemaphoreHandle trg = NULL;
 
 void triggertask(void *pvParameters)
 {
-	int txBuffer[3]={650,1500,2200};
+	int txBuffer[3]={650,1500,2400};
 
     while(1) {
 
@@ -65,21 +65,24 @@ void sendertask(void *pvParameters)
 	TIM_Pulse = timerPWM.TIM_Pulse;
 	TIM2->CCR4=2000;
 
+
+
     while(1) {
 
 		for(int i=0; i<3;i++){
 	       vTaskDelay(750/portTICK_RATE_MS);
 			xQueueReceive(queue_handle,&rxBuffer[i],1000);
 			TIM2->CCR4=rxBuffer[i];
+			
 			clearlcd();
 			sprintf(buffer, "Servo :%d us ", rxBuffer[i]);
 			setpos(0,0);
 			str_lcd(buffer);
 			setpos(0,1);
-			sprintf(buffer,"f: %lu" ,get_cpuFreq());
+			sprintf(buffer,"freq: %lu" ,get_cpuFreq());
 			str_lcd(buffer);
 
-
+			
 
 		}
 
@@ -94,8 +97,8 @@ void GUI (void *pvParameters){
 	const portTickType xFrequency = 10;
 	xLastWakeTime = xTaskGetTickCount();
 	while(1){
-		   vTaskDelayUntil(&xLastWakeTime,xFrequency);
-          processPacket();
+		  vTaskDelayUntil(&xLastWakeTime,xFrequency);
+          //processPacket();
 
 
 	}
@@ -108,15 +111,20 @@ void GUI (void *pvParameters){
 //-----------------------------------------
 int main(){
 
-
+    servo_init();
     SystemInit();
-
-
-	I2C1_init();
+    I2C1_init();
 	lcd_init();
 	clearlcd();
-    servo_init();
+   
  	USART_init();
+ 	buzzerInit();
+	
+
+
+ 	GPIO_WriteBit(GPIOB,GPIO_Pin_14, Bit_SET);
+    _delay_ms(500);
+    GPIO_WriteBit(GPIOB,GPIO_Pin_14, Bit_RESET);
 
 
  queue_handle = xQueueCreate(3,sizeof(int));
@@ -144,6 +152,7 @@ void servo_init(void) {
 	GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AF_PP;
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure) ;
 
 
 	TIM_TimeBaseStructInit(&timer);
