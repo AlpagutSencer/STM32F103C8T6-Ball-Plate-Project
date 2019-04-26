@@ -89,20 +89,35 @@ $(PROJECT).elf: $(SOURCES)
 
 # remove binary files
 clean:
-	@echo "------------------------------------"
-	@echo "Erasing Solutions"
+	@echo "************************************"
+	@echo -e '\e[91mCLEANING SOLUTIONS\e[39m'
 	@echo "------------------------------------"
 	rm -f *.o *.elf *.hex *.bin
+	@echo Done!
 
 # flash
 burn:
-	 $(ST_FLASH) write $(PROJECT).bin 0x8000000
+	@echo "************************************"
+	@echo -e '\e[5mBURNING\e[25m'
+	@echo "------------------------------------"
+	$(ST_FLASH) write $(PROJECT).bin 0x8000000
+	@echo Done !
 erase:
-	 $(ST_FLASH) erase 
+	@echo "************************************"
+	@echo -e '\e[91mFLASH ERASE\e[39m'
+	@echo "------------------------------------"
+	@$(ST_FLASH) erase 
+	@echo Done!
 deploy:
-	 make clean && make all && make burn
+	@echo "************************************"
+	@echo -e '\e[5mDEPLOY SEQUENCE INITIALIZED\e[25m'
+	@echo "------------------------------------"
+	@make clean && make all && make burn
 debug:
-	arm-none-eabi-gdb led.elf
+	@echo "************************************"
+	@echo "DEBUG INTERFACE"
+	@echo "------------------------------------"
+	@arm-none-eabi-gdb led.elf
 
 	
 

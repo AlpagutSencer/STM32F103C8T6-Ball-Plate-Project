@@ -6,6 +6,7 @@
 #include "misc.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_tim.h"
+#include "stm32f10x_iwdg.h"
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "semphr.h"
@@ -26,6 +27,7 @@ GPIO_InitTypeDef GPIO_InitStructure;
 
 static xQueueHandle queue_handle = NULL;
 void servo_init(void);
+uint32_t servoMap (uint8_t angle);
 int TIM_Pulse;
 char str[20];
 static xSemaphoreHandle trg = NULL;
@@ -37,14 +39,18 @@ static xSemaphoreHandle trg = NULL;
 void triggertask(void *pvParameters)
 {
 	int txBuffer[3]={650,1500,2400};
+	
+            
+            
 
     while(1) {
 
-
+		
 
 		for(int j=0; j<3;j++){
 	       vTaskDelay(750/portTICK_RATE_MS);
 			xQueueSend(queue_handle,&txBuffer[j],1000);
+
 		}
 
 
@@ -59,40 +65,56 @@ void triggertask(void *pvParameters)
 void sendertask(void *pvParameters)
 {
 
-
+  
 	int rxBuffer[3];
 	char buffer[16];
 	TIM_Pulse = timerPWM.TIM_Pulse;
 	TIM2->CCR4=2000;
-
+    
 
 
     while(1) {
 
-		for(int i=0; i<3;i++){
+            
+
+         
+		/*for(int i=0; i<3;i++){
 	       vTaskDelay(750/portTICK_RATE_MS);
 			xQueueReceive(queue_handle,&rxBuffer[i],1000);
+
+           
+
 			TIM2->CCR4=rxBuffer[i];
 			
 			clearlcd();
 			sprintf(buffer, "Servo :%d us ", rxBuffer[i]);
 			setpos(0,0);
 			str_lcd(buffer);
-			setpos(0,1);
+			/*setpos(0,1);
 			sprintf(buffer,"freq: %lu" ,get_cpuFreq());
 			str_lcd(buffer);
+         }*/
 
-			
+        for (int i=30;i<150;i++)
+           {
+             
+            TIM2->CCR4= servoMap(i);
+            setpos(0,0);
+            sprintf(buffer, "Servo :%ld  ", servoMap(i));
+			str_lcd(buffer);
+			vTaskDelay(500/portTICK_RATE_MS);
 
-		}
+           }
 
-
- }
+         }
 }
+
+
+
 
 void GUI (void *pvParameters){
 
-
+   
 	portTickType xLastWakeTime;
 	const portTickType xFrequency = 10;
 	xLastWakeTime = xTaskGetTickCount();
@@ -104,6 +126,23 @@ void GUI (void *pvParameters){
 	}
 
 }
+
+/*void IWDG_Reset (void *pvParameters){
+
+   IWDG_ReloadCounter();
+	portTickType xLastWakeTime;
+	const portTickType xFrequency = 1000;
+	xLastWakeTime = xTaskGetTickCount();
+	while(1){
+		  vTaskDelayUntil(&xLastWakeTime,xFrequency);
+			IWDG_ReloadCounter();
+          //processPacket();
+
+
+	}
+
+}*/
+
 
 
 
@@ -121,9 +160,20 @@ int main(){
  	buzzerInit();
 	
 
+  /*IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+  IWDG_SetPrescaler(IWDG_Prescaler_128); // 4, 8, 16 ... 256
+  IWDG_SetReload(0x0FFF);//This parameter must be a number between 0 and 0x0FFF.
+  IWDG_ReloadCounter();
+  IWDG_Enable();*/
+
+
+
+
+
+
 
  	GPIO_WriteBit(GPIOB,GPIO_Pin_14, Bit_SET);
-    _delay_ms(500);
+    _delay_ms(250);
     GPIO_WriteBit(GPIOB,GPIO_Pin_14, Bit_RESET);
 
 
@@ -135,6 +185,7 @@ int main(){
  xTaskCreate(triggertask, (const char *)"triggertask", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
  xTaskCreate(sendertask, (const char *)"sendertask", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
  xTaskCreate(GUI, (const char *)"GUI", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY, NULL);
+ //xTaskCreate(IWDG_Reset, (const char *)"IWDG_Reset", configMINIMAL_STACK_SIZE, (void *)NULL, tskIDLE_PRIORITY -1, NULL);
  //Start the scheduler
  vTaskStartScheduler();
 
@@ -170,4 +221,9 @@ void servo_init(void) {
 	TIM_OC4Init(TIM2, &timerPWM);
 
     TIM_Cmd(TIM2, ENABLE);
+}
+
+uint32_t servoMap (uint8_t angle){ //Lineer Interpolation for 500-2500 us driven servos
+
+	return ((angle*11.11111111)+500);
 }
