@@ -60,9 +60,9 @@ OBJCOPY = arm-none-eabi-objcopy
 ST_FLASH ?= st-flash
 
 # specify compiler flags
-CFLAGS  = -g -O2 -Wall
+CFLAGS  = -g -O2 -Wall -Wno-unused-variable
 CFLAGS += -T$(STD_PERIPH_LIBS)/Project/STM32F10x_StdPeriph_Template/TrueSTUDIO/STM3210B-EVAL/stm32_flash.ld
-CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork -specs=nano.specs  -specs=nosys.specs
+CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork -specs=nano.specs  -specs=nosys.specs 
 CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 CFLAGS += -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER
 CFLAGS += -Wl,--gc-sections
@@ -100,7 +100,7 @@ burn:
 	@echo "************************************"
 	@echo -e '\e[5mBURNING\e[25m'
 	@echo "------------------------------------"
-	$(ST_FLASH) write $(PROJECT).bin 0x8000000
+	$(ST_FLASH) --reset write $(PROJECT).bin 0x8000000
 	@echo Done !
 erase:
 	@echo "************************************"

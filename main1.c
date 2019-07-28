@@ -7,6 +7,7 @@
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_tim.h"
 #include "stm32f10x_iwdg.h"
+#include "stm32f10x_adc.h"
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "semphr.h"
@@ -16,6 +17,7 @@
 #include "twilcd.h"
 #include "stdbool.h"
 #include "usart.h"
+#include "touch.h"
 
 #define SYSCLK 72000000
 #define PRESCALER 72
@@ -68,6 +70,7 @@ void sendertask(void *pvParameters)
   
 	int rxBuffer[3];
 	char buffer[16];
+
 	TIM_Pulse = timerPWM.TIM_Pulse;
 	TIM2->CCR4=2000;
     
@@ -75,7 +78,7 @@ void sendertask(void *pvParameters)
 
     while(1) {
 
-            
+    
 
          
 		/*for(int i=0; i<3;i++){
@@ -90,12 +93,26 @@ void sendertask(void *pvParameters)
 			sprintf(buffer, "Servo :%d us ", rxBuffer[i]);
 			setpos(0,0);
 			str_lcd(buffer);
-			/*setpos(0,1);
+			setpos(0,1);
 			sprintf(buffer,"freq: %lu" ,get_cpuFreq());
 			str_lcd(buffer);
          }*/
+    	
+    	
 
-        for (int i=30;i<150;i++)
+
+		 int new = readX();
+		
+		 int new2 = 0;//readY();
+        sprintf(buffer, " x:  %d  y:  %d \r\n", new,new2);
+    	/*setpos(0,0);
+		str_lcd(buffer);*/
+    	vTaskDelay(30/portTICK_RATE_MS);
+    	USART_SendString(USART1,buffer);
+		
+    
+
+        /*for (int i=30;i<150;i++)
            {
              
             TIM2->CCR4= servoMap(i);
@@ -103,8 +120,9 @@ void sendertask(void *pvParameters)
             sprintf(buffer, "Servo :%ld  ", servoMap(i));
 			str_lcd(buffer);
 			vTaskDelay(500/portTICK_RATE_MS);
+			
 
-           }
+           }*/
 
          }
 }
@@ -150,14 +168,31 @@ void GUI (void *pvParameters){
 //-----------------------------------------
 int main(){
 
+  /*GPIO_InitTypeDef GPIO_InitStructure;
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+  GPIO_StructInit(&GPIO_InitStructure);*/
+
+  /*GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0; //GPIOA pin 0 output push pull
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);*/
+
+
+               
+   
+
     servo_init();
     SystemInit();
     I2C1_init();
 	lcd_init();
 	clearlcd();
-   
+    adc_init();
  	USART_init();
  	buzzerInit();
+
+ 
+
+
 	
 
   /*IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
@@ -172,9 +207,9 @@ int main(){
 
 
 
- 	GPIO_WriteBit(GPIOB,GPIO_Pin_14, Bit_SET);
+ 	/*GPIO_WriteBit(GPIOB,GPIO_Pin_14, Bit_SET);
     _delay_ms(250);
-    GPIO_WriteBit(GPIOB,GPIO_Pin_14, Bit_RESET);
+    GPIO_WriteBit(GPIOB,GPIO_Pin_14, Bit_RESET);*/
 
 
  queue_handle = xQueueCreate(3,sizeof(int));
