@@ -103,12 +103,12 @@ void sendertask(void *pvParameters)
 
 		 int new = readX();
 		
-		 int new2 = 0;//readY();
-        sprintf(buffer, " x:  %d  y:  %d \r\n", new,new2);
-    	/*setpos(0,0);
-		str_lcd(buffer);*/
-    	vTaskDelay(30/portTICK_RATE_MS);
-    	USART_SendString(USART1,buffer);
+		 int new2 = readY();
+        sprintf(buffer, "x: %d y: %d ", new,new2);
+    	setpos(0,0);
+		str_lcd(buffer);
+    	vTaskDelay(10/portTICK_RATE_MS);
+    	//USART_SendString(USART1,buffer);
 		
     
 

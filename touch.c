@@ -55,8 +55,8 @@ TouchScreenErrorCodes adc_init(void)
 	RCC_ADCCLKConfig (RCC_PCLK2_Div6);
 	
 	ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;
-	ADC_InitStructure.ADC_ScanConvMode = ENABLE;
-	ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;	// we work in continuous sampling mode
+	ADC_InitStructure.ADC_ScanConvMode = DISABLE;
+	ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;	// we work in continuous sampling mode
 	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
 	ADC_InitStructure.ADC_NbrOfChannel = 2;
@@ -78,9 +78,9 @@ TouchScreenErrorCodes adc_init(void)
 
 
 
-uint16_t readX (void){
+uint16_t readY (void){
 
-	uint16_t adc_value;
+	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
     GPIO_StructInit(&GPIO_InitStructure);
 	
@@ -89,8 +89,9 @@ uint16_t readX (void){
 
     GPIOA->ODR |= 0x00000001;
 
-    ADC1->SQR1 = 0x00000000;
-    ADC1->SQR3 |= (1<<0);
+   // ADC1->SQR1 = 0x00000000;
+    ADC1->SQR3 = (1<<0);
+    _delay_ms(10);
     ADC_SoftwareStartConvCmd(ADC1, ENABLE);
 
     /*_delay_ms(500);
@@ -104,21 +105,20 @@ uint16_t readX (void){
 	
 	//ADC_RegularChannelConfig(ADC1,ADC_Channel_1, 1,ADC_SampleTime_1Cycles5);// define regular conversion config
   
-    while (ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET);
+    while ((ADC1->SR & ADC_SR_EOC) == 0){
 
-
-    adc_value = ADC_GetConversionValue(ADC1);
+    }
 	
 	ADC_SoftwareStartConvCmd(ADC1, DISABLE);
 	
 
 
-return adc_value;
+return ADC1->DR;
 	
 }
 
 
-uint16_t readY (void) {
+uint16_t readX (void) {
 
 	uint16_t adc_value2;
 	
@@ -128,7 +128,11 @@ uint16_t readY (void) {
 	
     GPIOA->ODR |= 0x00000002;
     
-	ADC1->SQR3 = 2;
+	ADC1->SQR1 = 0x00000000;
+    ADC1->SQR3 = (2<<0);
+
+    _delay_ms(10);
+    ADC_SoftwareStartConvCmd(ADC1, ENABLE);
 
   // A0 and A2 pins declared as output
 	/*RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
@@ -158,15 +162,17 @@ uint16_t readY (void) {
 	
 	//ADC_RegularChannelConfig(ADC1,ADC_Channel_2, 1,ADC_SampleTime_1Cycles5);// define regular conversion config
   
-    ADC_SoftwareStartConvCmd(ADC1, ENABLE);
-    while (ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET);
+   
+   while ((ADC1->SR & ADC_SR_EOC) == 0){
+
+    }
 
 
-    adc_value2 = ADC_GetConversionValue(ADC1);
+    
 	
 	ADC_SoftwareStartConvCmd(ADC1, DISABLE);
     
-	return adc_value2;
+	return ADC1->DR;
 }
 
 
