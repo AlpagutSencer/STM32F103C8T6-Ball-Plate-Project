@@ -78,7 +78,7 @@ TouchScreenErrorCodes adc_init(void)
 
 
 
-uint16_t readY (void){
+uint16_t readX (void){
 
 	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
@@ -118,18 +118,18 @@ return ADC1->DR;
 }
 
 
-uint16_t readX (void) {
+uint16_t readY (void) {
 
 	uint16_t adc_value2;
 	
 	GPIOA->CRL &=0x0; //~(GPIO_CRL_MODE0 | GPIO_CRL_CNF0);
-    GPIOA->CRL |= 0x00003034;//GPIO_CRL_MODE0;
+    GPIOA->CRL |= 0x00003430;//GPIO_CRL_MODE0;
 
 	
     GPIOA->ODR |= 0x00000002;
     
 	ADC1->SQR1 = 0x00000000;
-    ADC1->SQR3 = (2<<0);
+    ADC1->SQR3 = (0<<0);
 
     _delay_ms(10);
     ADC_SoftwareStartConvCmd(ADC1, ENABLE);
@@ -166,9 +166,28 @@ uint16_t readX (void) {
    while ((ADC1->SR & ADC_SR_EOC) == 0){
 
     }
-
-
+	
+	ADC_SoftwareStartConvCmd(ADC1, DISABLE);
     
+	return ADC1->DR;
+}
+
+uint16_t isTouched(void)
+{
+	
+ bool touch;
+ GPIOA->CRL &=0x0;
+ GPIOA->CRL |= 0x00003448;
+ GPIOA->ODR |= 0x00000001;
+ ADC1->SQR1 = 0x00000000;
+ ADC1->SQR3 = (1<<0);
+
+ _delay_ms(10);
+  ADC_SoftwareStartConvCmd(ADC1, ENABLE);
+
+while ((ADC1->SR & ADC_SR_EOC) == 0){
+
+    }
 	
 	ADC_SoftwareStartConvCmd(ADC1, DISABLE);
     
