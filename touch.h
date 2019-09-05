@@ -40,6 +40,8 @@ typedef enum
 TouchScreenErrorCodes adc_init();
 uint16_t readX (void);
 uint16_t readY (void);
+uint16_t isTouched(void);
+
 
 
 
