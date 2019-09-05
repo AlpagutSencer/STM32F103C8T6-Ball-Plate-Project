@@ -85,7 +85,7 @@ uint16_t readY (void){
     GPIO_StructInit(&GPIO_InitStructure);
 	
     GPIOA->CRL &=0x0; //~(GPIO_CRL_MODE0 | GPIO_CRL_CNF0);
-    GPIOA->CRL |= 0x00004303;//GPIO_CRL_MODE0;
+    GPIOA->CRL |= 0x00040303;//GPIO_CRL_MODE0;
 
     GPIOA->ODR |= 0x00000001;
 
@@ -123,7 +123,7 @@ uint16_t readX (void) {
 	uint16_t adc_value2;
 	
 	GPIOA->CRL &=0x0; //~(GPIO_CRL_MODE0 | GPIO_CRL_CNF0);
-    GPIOA->CRL |= 0x00003034;//GPIO_CRL_MODE0;
+    GPIOA->CRL |= 0x00030034;//GPIO_CRL_MODE0;
 
 	
     GPIOA->ODR |= 0x00000002;
