@@ -104,7 +104,9 @@ void sendertask(void *pvParameters)
 		 int new = readX();
 		
 		 int new2 = readY();
-        sprintf(buffer, "x: %d y: %d ", new,new2);
+
+		 int new3 = isTouched();
+        sprintf(buffer, "%d : %d : %d", new,new2,new3);
     	setpos(0,0);
 		str_lcd(buffer);
     	vTaskDelay(10/portTICK_RATE_MS);

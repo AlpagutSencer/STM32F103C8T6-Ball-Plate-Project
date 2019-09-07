@@ -22,11 +22,12 @@
 #include "touch.h"
 #include "delay.h"
 
+#define SAMPLE 25
 
 ADC_InitTypeDef ADC_InitStructure;
 GPIO_InitTypeDef  GPIO_InitStructure;
 
-volatile uint16_t ADCBuffer[2] = {0xFFFF, 0xFFFF};
+
 
 
 TouchScreenErrorCodes adc_init(void)
@@ -80,6 +81,8 @@ TouchScreenErrorCodes adc_init(void)
 
 uint16_t readX (void){
 
+	uint32_t avgSum = 0;
+
 	
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
     GPIO_StructInit(&GPIO_InitStructure);
@@ -89,7 +92,7 @@ uint16_t readX (void){
 
     GPIOA->ODR |= 0x00000001;
 
-   // ADC1->SQR1 = 0x00000000;
+    ADC1->SQR1 = 0x00000000;
     ADC1->SQR3 = (1<<0);
     _delay_ms(10);
     ADC_SoftwareStartConvCmd(ADC1, ENABLE);
@@ -111,26 +114,30 @@ uint16_t readX (void){
 	
 	ADC_SoftwareStartConvCmd(ADC1, DISABLE);
 	
+   for(int i=0; i<SAMPLE; i++){
+     
+	 avgSum = avgSum + ADC1->DR ;
 
+   }
 
-return ADC1->DR;
+   return avgSum/SAMPLE;
 	
 }
 
 
 uint16_t readY (void) {
 
-	uint16_t adc_value2;
+	uint32_t avgSum=0;
 	
 	GPIOA->CRL &=0x0; //~(GPIO_CRL_MODE0 | GPIO_CRL_CNF0);
-<<<<<<< HEAD
+
     GPIOA->CRL |= 0x00030034;//GPIO_CRL_MODE0;
 
 	
     GPIOA->ODR |= 0x00000002;
     
 	ADC1->SQR1 = 0x00000000;
-    ADC1->SQR3 = (0<<0);
+    ADC1->SQR3 = (2<<0);
 
     _delay_ms(10);
     ADC_SoftwareStartConvCmd(ADC1, ENABLE);
@@ -170,17 +177,25 @@ uint16_t readY (void) {
 	
 	ADC_SoftwareStartConvCmd(ADC1, DISABLE);
     
-	return ADC1->DR;
+	for(int i=0; i<SAMPLE; i++){
+     
+	 avgSum = avgSum + ADC1->DR ;
+
+   }
+
+   return avgSum/SAMPLE;
 }
 
 uint16_t isTouched(void)
 {
 	
- bool touch;
+ bool touch ;
  GPIOA->CRL &=0x0;
  GPIOA->CRL |= 0x00003448;
  GPIOA->ODR |= 0x00000001;
  ADC1->SQR1 = 0x00000000;
+
+
  ADC1->SQR3 = (1<<0);
 
  _delay_ms(10);
@@ -190,10 +205,39 @@ while ((ADC1->SR & ADC_SR_EOC) == 0){
 
     }
 	
-	ADC_SoftwareStartConvCmd(ADC1, DISABLE);
+ADC_SoftwareStartConvCmd(ADC1, DISABLE);
     
-	return ADC1->DR;
+int z1 = ADC1->DR;
+
+
+/*ADC1->SQR3 = (2<<0);
+
+ _delay_ms(10);
+  ADC_SoftwareStartConvCmd(ADC1, ENABLE);
+
+while ((ADC1->SR & ADC_SR_EOC) == 0){
+
+    }
+	
+ADC_SoftwareStartConvCmd(ADC1, DISABLE);
+    
+int z2 = ADC1->DR;*/
+
+
+if(z1>3000){
+	touch = true;
 }
+else
+{
+	touch = false;
+}
+
+
+
+
+return touch;
+
+} 
 
 
 
