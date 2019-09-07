@@ -55,7 +55,7 @@ PROJECT ?= led
 # compiler, objcopy (should be in PATH)
 CC = arm-none-eabi-gcc
 OBJCOPY = arm-none-eabi-objcopy
-
+SIZE = arm-none-eabi-size
 # path to st-flash (or should be specified in PATH)
 ST_FLASH ?= st-flash
 
@@ -84,15 +84,17 @@ all: $(PROJECT).elf
 # compile
 $(PROJECT).elf: $(SOURCES)
 	$(CC) $(CFLAGS) $^ -o $@
-	$(OBJCOPY) -O ihex $(PROJECT).elf $(PROJECT).hex
-	$(OBJCOPY) -O binary $(PROJECT).elf $(PROJECT).bin
-
+	$(OBJCOPY) -O ihex $(PROJECT).elf   $(PROJECT).hex
+	$(OBJCOPY) -O binary $(PROJECT).elf $(PROJECT).bin 
+	@echo $(PROJECT).bin "file size is (kB) :" 
+	@stat -L -c %s $(PROJECT).bin
+	@$(SIZE) $(PROJECT).elf
 # remove binary files
 clean:
 	@echo "************************************"
 	@echo -e '\e[91mCLEANING SOLUTIONS\e[39m'
 	@echo "------------------------------------"
-	rm -f *.o *.elf *.hex *.bin
+	@rm -f *.o *.elf *.hex *.bin
 	@echo Done!
 
 # flash
