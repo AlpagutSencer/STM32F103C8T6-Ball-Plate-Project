@@ -62,7 +62,7 @@ ST_FLASH ?= st-flash
 # specify compiler flags
 CFLAGS  = -g -O2 -Wall -Wno-unused-variable
 CFLAGS += -T$(STD_PERIPH_LIBS)/Project/STM32F10x_StdPeriph_Template/TrueSTUDIO/STM3210B-EVAL/stm32_flash.ld
-CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork -specs=nano.specs  -specs=nosys.specs 
+CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork -specs=nano.specs -specs=nosys.specs 
 CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 CFLAGS += -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER
 CFLAGS += -Wl,--gc-sections
@@ -119,7 +119,7 @@ debug:
 	@echo "************************************"
 	@echo "DEBUG INTERFACE"
 	@echo "------------------------------------"
-	@arm-none-eabi-gdb led.elf
+	@arm-none-eabi-gdb $(PROJECT).elf
 
 	
 

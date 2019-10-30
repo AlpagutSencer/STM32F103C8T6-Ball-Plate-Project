@@ -70,10 +70,12 @@ void sendertask(void *pvParameters)
   
 	int rxBuffer[3];
 	char buffer[16];
+	char buffer2[18];
+	float deng = 2.54;
 
-	TIM_Pulse = timerPWM.TIM_Pulse;
-	TIM2->CCR4=2000;
-    
+
+	
+  
 
 
     while(1) {
@@ -89,43 +91,34 @@ void sendertask(void *pvParameters)
 
 			TIM2->CCR4=rxBuffer[i];
 			
-			clearlcd();
-			sprintf(buffer, "Servo :%d us ", rxBuffer[i]);
-			setpos(0,0);
-			str_lcd(buffer);
-			setpos(0,1);
-			sprintf(buffer,"freq: %lu" ,get_cpuFreq());
-			str_lcd(buffer);
+			
+			
+            //sprintf(buffer2, "Servo :%f", deng);
+			
+			
          }*/
     	
     	
 
-
+        
 		 int new = readX();
 		
 		 int new2 = readY();
 
 		 int new3 = isTouched();
-        sprintf(buffer, "%d : %d : %d", new,new2,new3);
+		 
+		 
+        sprintf(buffer, "%d : %d : %d \r\n", new,new2,new3);
     	setpos(0,0);
 		str_lcd(buffer);
     	vTaskDelay(10/portTICK_RATE_MS);
     	//USART_SendString(USART1,buffer);
+       
+        TIM_Pulse = timerPWM.TIM_Pulse;
+        TIM2->CCR4=2200;
 		
-    
-
-        /*for (int i=30;i<150;i++)
-           {
-             
-            TIM2->CCR4= servoMap(i);
-            setpos(0,0);
-            sprintf(buffer, "Servo :%ld  ", servoMap(i));
-			str_lcd(buffer);
-			vTaskDelay(500/portTICK_RATE_MS);
-			
-
-           }*/
-
+		
+        
          }
 }
 
@@ -194,7 +187,6 @@ int main(){
 
  
 
-
 	
 
   /*IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
@@ -209,10 +201,7 @@ int main(){
 
 
 
- 	/*GPIO_WriteBit(GPIOB,GPIO_Pin_14, Bit_SET);
-    _delay_ms(250);
-    GPIO_WriteBit(GPIOB,GPIO_Pin_14, Bit_RESET);*/
-
+ 	
 
  queue_handle = xQueueCreate(3,sizeof(int));
 
@@ -239,13 +228,13 @@ void servo_init(void) {
 	GPIO_StructInit(&GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AF_PP;
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure) ;
 
 
 	TIM_TimeBaseStructInit(&timer);
-	timer.TIM_Prescaler = PRESCALER;
-	timer.TIM_Period = SYSCLK / PRESCALER / 50;
+	timer.TIM_Prescaler = PRESCALER-1;
+	timer.TIM_Period = (SYSCLK / PRESCALER / 50)-1;
 	timer.TIM_ClockDivision = 0;
 	timer.TIM_CounterMode = TIM_CounterMode_Up;
 	TIM_TimeBaseInit(TIM2, &timer);
@@ -257,7 +246,7 @@ void servo_init(void) {
 	timerPWM.TIM_OCPolarity = TIM_OCPolarity_High;
 	TIM_OC4Init(TIM2, &timerPWM);
 
-    TIM_Cmd(TIM2, ENABLE);
+     TIM_Cmd(TIM2, ENABLE);
 }
 
 uint32_t servoMap (uint8_t angle){ //Lineer Interpolation for 500-2500 us driven servos

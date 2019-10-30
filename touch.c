@@ -33,22 +33,11 @@ GPIO_InitTypeDef  GPIO_InitStructure;
 TouchScreenErrorCodes adc_init(void)
 {
 	
-	
-	
-   
     
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
     GPIO_StructInit(&GPIO_InitStructure);
-
-
-    
-   RCC->APB2ENR |= 0x00000004; //RCC_APB2ENR_IOPAEN;
+    RCC->APB2ENR |= 0x00000004; //RCC_APB2ENR_IOPAEN;
    
-
-
-
-
-
 
      /*GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_2 ;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
@@ -87,8 +76,8 @@ uint16_t readX (void){
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
     GPIO_StructInit(&GPIO_InitStructure);
 	
-    GPIOA->CRL &=0x0; //~(GPIO_CRL_MODE0 | GPIO_CRL_CNF0);
-    GPIOA->CRL |= 0x00040303;//GPIO_CRL_MODE0;
+    GPIOA->CRL =~(GPIO_CRL_MODE0 | GPIO_CRL_CNF0 | GPIO_CRL_MODE1 | GPIO_CRL_CNF1 | GPIO_CRL_MODE2 | GPIO_CRL_CNF2 |GPIO_CRL_MODE4 | GPIO_CRL_CNF4);
+    GPIOA->CRL |= 0x00040303;//GPIO_CRL_MODE0; 3043303
 
     GPIOA->ODR |= 0x00000001;
 
@@ -128,10 +117,10 @@ uint16_t readX (void){
 uint16_t readY (void) {
 
 	uint32_t avgSum=0;
-	
-	GPIOA->CRL &=0x0; //~(GPIO_CRL_MODE0 | GPIO_CRL_CNF0);
+	GPIOA->CRL =~(GPIO_CRL_MODE0 | GPIO_CRL_CNF0 | GPIO_CRL_MODE1 | GPIO_CRL_CNF1 | GPIO_CRL_MODE2 | GPIO_CRL_CNF2 |GPIO_CRL_MODE4 | GPIO_CRL_CNF4);
+	//GPIOA->CRL &=0x0; //~(GPIO_CRL_MODE0 | GPIO_CRL_CNF0);
 
-    GPIOA->CRL |= 0x00030034;//GPIO_CRL_MODE0;
+    GPIOA->CRL |= 0x00030034;//GPIO_CRL_MODE0; 3033034
 
 	
     GPIOA->ODR |= 0x00000002;
@@ -161,7 +150,7 @@ uint16_t readY (void) {
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
 	GPIO_Init(GPIOA,&GPIO_InitStructure);
-*/
+    */
 	
     
    
@@ -189,9 +178,9 @@ uint16_t readY (void) {
 uint16_t isTouched(void)
 {
 	
- bool touch ;
- GPIOA->CRL &=0x0;
- GPIOA->CRL |= 0x00003448;
+  bool touch ;
+  GPIOA->CRL =~(GPIO_CRL_MODE0 | GPIO_CRL_CNF0 | GPIO_CRL_MODE1 | GPIO_CRL_CNF1 | GPIO_CRL_MODE2 | GPIO_CRL_CNF2 |GPIO_CRL_MODE4 | GPIO_CRL_CNF4);
+ GPIOA->CRL |= 0x00000448;
  GPIOA->ODR |= 0x00000001;
  ADC1->SQR1 = 0x00000000;
 
@@ -226,6 +215,10 @@ int z2 = ADC1->DR;*/
 
 if(z1>3000){
 	touch = true;
+	GPIO_WriteBit(GPIOB,GPIO_Pin_14, Bit_SET);
+    _delay_ms(200);
+    GPIO_WriteBit(GPIOB,GPIO_Pin_14, Bit_RESET);
+
 }
 else
 {
